@@ -1,3 +1,5 @@
+require 'json'
+require 'faraday'
 require 'rspec/core'
 require 'rspec/core/formatters/base_formatter'
 

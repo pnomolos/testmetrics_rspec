@@ -22,6 +22,19 @@ RSpec.describe TestmetricsRspec do
   end
 
   it 'sends everything we need to the server' do
-    run_tests
+    result = run_tests
+    result = eval(result)
+    expect(result[:key]).to be_a(String)
+    expect(result[:branch]).to be_a(String)
+    expect(result[:sha]).to be_a(String)
+    expect(result[:metadata][:ruby_version]).to be_a(String)
+    expect(result[:metadata][:ci_platform]).to be_a(String)
+    expect(result[:total_run_time]).to be > 10
+
+    result[:tests].each do |test|
+      expect(test[:name]).to be_a(String)
+      expect(test[:total_run_time]).to be > 10
+      expect([:passed, :failed, :pending]).to include(test[:state])
+    end
   end
 end
