@@ -48,10 +48,20 @@ class TestmetricsRspec < RSpec::Core::Formatters::BaseFormatter
     end
   end
 
-  BRANCH_VARS = ["TRAVIS_BRANCH", "CIRCLE_BRANCH", "CI_COMMIT_REF_NAME", "BRANCH_NAME"]
+  BRANCH_VARS = ["TRAVIS_EVENT_TYPE", "CIRCLE_BRANCH", "CI_COMMIT_REF_NAME", "BRANCH_NAME"]
   def git_branch
-    correct_var = BRANCH_VARS.find do |var| ENV[var] != nil end
-    correct_var.nil? ? "Unknown" : ENV[correct_var]
+    correct_var = BRANCH_VARS.find do |var| ENV[var] != nil && ENV[var] != "" end
+
+    if correct_var == "TRAVIS_EVENT_TYPE"
+      case ENV[correct_var]
+      when "push"
+        ENV["TRAVIS_BRANCH"]
+      when "pull_request"
+        ENV["TRAVIS_PULL_REQUEST_BRANCH"]
+      end
+    else
+      correct_var.nil? ? "Unknown" : ENV[correct_var]
+    end
   end
 
   SHA_VARS = ["TRAVIS_COMMIT", "CIRCLE_SHA1", "CI_COMMIT_SHA", "REVISION"]
