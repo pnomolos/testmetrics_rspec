@@ -4,35 +4,7 @@ The official [RSpec][rspec] 2 & 3 client for [Testmetrics](https://www.testmetri
 
 ## Usage
 
-Install the gem:
-
-```sh
-gem install testmetrics_rspec
-```
-
-Use it:
-
-```sh
-rspec --format TestmetricsRspec 
-```
-
-You can use it in combination with other [formatters][rspec-formatters], too:
-
-```sh
-rspec --format progress --format TestmetricsRspec
-```
-
-  [rspec-formatters]: https://relishapp.com/rspec/rspec-core/v/3-6/docs/formatters
-
-In order for the metrics to be send to Testmetrics, you must have your
-Testmetrics Project Key set in the "TESTMETRICS_PROJECT_KEY" environment
-variable in your CI environment. If this environment variable isn't set, the
-collected metrics for your CI run will be discarded. This key should be kept
-private and not exposed to the public.
-
-### Using in your project with Bundler
-
-Add it to your Gemfile if you're using [Bundler][bundler]. Put it in the same groups as rspec.
+Add it to your Gemfile in the same groups as rspec.
 
 ```ruby
 group :test do
@@ -41,7 +13,7 @@ group :test do
 end
 ```
 
-Put the same arguments as the commands above in [your `.rspec`][rspec-file]:
+Add `TestmetricsRspec` as a formatter in [your `.rspec` file][rspec-file]:
 
 ```sh
 --format TestmetricsRspec
@@ -49,6 +21,43 @@ Put the same arguments as the commands above in [your `.rspec`][rspec-file]:
 
   [bundler]: https://bundler.io
   [rspec-file]: https://relishapp.com/rspec/rspec-core/v/3-6/docs/configuration/read-command-line-configuration-options-from-files
+
+In order for the metrics to be sent to Testmetrics, you must have your
+Testmetrics Project Key set in the "TESTMETRICS_PROJECT_KEY" environment
+variable in your CI environment. If this environment variable isn't set, the
+collected metrics for your CI run will be discarded.
+
+This key should be kept private and not exposed to the public.
+
+### Additional setup for using with the `parallel_tests` gem
+
+If you are running your tests in parallel in CI with the `parallel_tests` gem,
+there are additional steps you need to take to start collecting metrics in CI.
+
+First, do the steps listed above.
+
+If you have a `.rspec_parallel` file, also add `TestmetricsRspec` as a formatter
+there:
+
+```sh
+--format TestmetricsRspec
+```
+
+Then, add the following task to your `Rakefile`
+
+```ruby
+require 'testmetrics_rspec'
+task :testmetrics_parallel_rspec do
+  TestmetricsRspec::ParallelTests.run()
+end
+```
+
+Lastly, you'll need to change your CI script to use that rake task to run your
+tests. `rake testmetrics_parallel_rspec` (or whatever you name that task - it
+can be whatever you want) is just a wrapper around running `parallel_rspec`, so
+all command line options that you would normally give work just the same. You
+just replace `parallel_rspec` with `rake testmetrics_parallel_rspec` and it will
+work.
 
 ## License
 
