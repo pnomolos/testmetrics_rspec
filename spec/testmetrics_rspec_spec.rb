@@ -41,4 +41,9 @@ RSpec.describe TestmetricsRspec do
       expect(%i[passed failed pending]).to include(test[:state])
     end
   end
+
+  it 'is slow and will fail the check' do
+    sleep(1)
+    expect(true).to be(true)
+  end
 end
