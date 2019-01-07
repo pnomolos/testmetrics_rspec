@@ -5,10 +5,12 @@ RSpec.describe TestmetricsRspec do
   EXAMPLE_DIR = File.expand_path('../example', __dir__)
 
   def run_tests
+    key = ENV["TESTMETRICS_PROJECT_KEY"]
+    ENV["TESTMETRICS_PROJECT_KEY"] = nil
     sio = StringIO.new
     args = ['bundle', 'exec', 'rspec', '--format', 'TestmetricsRspec']
     begin
-      PTY.spawn(*args, chdir: EXAMPLE_DIR) do |r, w, pid|
+      PTY.spawn(*args, chdir: EXAMPLE_DIR) do |r, _w, pid|
         begin
           r.each_line { |l| sio.puts(l) }
         rescue Errno::EIO
@@ -18,6 +20,8 @@ RSpec.describe TestmetricsRspec do
       end
     rescue PTY::ChildExited
     end
+
+    ENV["TESTMETRICS_PROJECT_KEY"] = key
     sio.string
   end
 
@@ -34,7 +38,7 @@ RSpec.describe TestmetricsRspec do
     result[:tests].each do |test|
       expect(test[:name]).to be_a(String)
       expect(test[:total_run_time]).to be > 10
-      expect([:passed, :failed, :pending]).to include(test[:state])
+      expect(%i[passed failed pending]).to include(test[:state])
     end
   end
 end
