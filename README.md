@@ -57,7 +57,10 @@ tests. `rake testmetrics_parallel_rspec` (or whatever you name that task - it
 can be whatever you want) is just a wrapper around running `parallel_rspec`, so
 all command line options that you would normally give work just the same. You
 just replace `parallel_rspec` with `rake testmetrics_parallel_rspec` and it will
-work.
+work.  You'll probably want to include `--` after `rake {command}` so that arguments
+are passed on to `parallel_tests` instead of being consumed by `rake`. 
+
+Example: `rake testmetrics_parallel_rspec -- --only-group $TEST_GROUP`
 
 ## License
 
